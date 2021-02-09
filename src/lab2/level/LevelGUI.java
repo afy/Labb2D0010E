@@ -21,6 +21,8 @@ public class LevelGUI implements Observer {
 	public LevelGUI(Level level, String name) {
 		
 		this.lv = level;
+		
+		// add LevelGUI (this) as an observer of level
 		level.addObserver(this);
 		
 		JFrame frame = new JFrame(name);
@@ -38,17 +40,14 @@ public class LevelGUI implements Observer {
 	
 	
 	public void update(Observable arg0, Object arg1) {
+		// to paint on update, simply call repaint on display
 		d.repaint();
 	}
 	
 	private class Display extends JPanel {
-		
-		
-		public Display(Level fp, int x, int y) {
-		
 			
-			addKeyListener(new Listener());
-			
+		public Display(Level fp, int x, int y) {		
+			addKeyListener(new Listener());	
 			setBackground(Color.black);
 			setPreferredSize(new Dimension(x+20,y+20));
 			setFocusable(true);
@@ -57,29 +56,74 @@ public class LevelGUI implements Observer {
 			
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-
+			
 			// draw rooms
+			Room l = lv.current; // for cleaner code
+			
 			for (Room r : lv.rooms) 
 			{
-				g.setColor(r.color);
+				// draw the room itself
+				g.setColor(r.color.darker());
 				g.fillRect(r.x, r.y, r.dx, r.dy);
+				
+				// draw all corridors from this room
+				for (Room[] c : r.corridors) 
+				{
+					DrawCorridor(g, c);
+				}
 			}
 			
 			// draw current room border
-			g.setColor(new Color(255-lv.current.color.getRed(),
-					255-lv.current.color.getGreen(),
-					255-lv.current.color.getBlue())
-					);
-			g.drawRect(lv.current.x, lv.current.y, 
-					lv.current.dx, lv.current.dy);
+			g.setColor(Color.white);
+			g.drawRect(l.x, l.y,l.dx, l.dy);
 		}
 		
+		public void DrawCorridor(Graphics g, Room[] corridor)
+		{
+			// unpack rooms from given corridor (looks better)
+			Room rFrom = corridor[0];
+			Room rTo = corridor[1];
+
+			g.setColor(rTo.color);
+			int n = 5; // shift line from block
+			int m = 10; // limit length; remove n px from each side
+						   // of line 
+				
+			// for corridors north of block
+			// the position logic is too hard to explain here
+			// but is in theory pretty simple
+			if (rTo.y > rFrom.y) { 
+				g.drawLine(rFrom.x+m, rFrom.y+rFrom.dy+n, 
+						rFrom.x+rFrom.dx-m, rFrom.y+rFrom.dy+n);
+			}
+			
+			// for corridors east of block
+			else if (rTo.x > rFrom.x) {
+				g.drawLine(rFrom.x+rFrom.dx+n, rFrom.y+m, 
+						rFrom.x+rFrom.dx+n, rFrom.y+rFrom.dy-m);
+			}
+			
+			// for corridors south of block
+			else if (rTo.y < rFrom.y) { // south
+				g.drawLine(rFrom.x+m, rFrom.y-n, 
+						rFrom.x+rFrom.dx-m, rFrom.y-n);
+			}
+				
+			// for corridors west of block
+			else if (rTo.x < rFrom.x) { // west
+				g.drawLine(rFrom.x-n, rFrom.y+m, 
+						rFrom.x-n, rFrom.y+rFrom.dy-m);
+			}
+		}
 
 	 	private class Listener implements KeyListener {
 
 	 		
 	 		public void keyPressed(KeyEvent arg0)
 	 		{
+	 			// the keycodes look arbirtrary 
+	 			// but are simply expanded from the library 
+	 			// they come from, making it look a bit better
 	 			switch(arg0.getKeyCode()) 
 	 			{
 	 			case 0x57: // keycode for w; move north
