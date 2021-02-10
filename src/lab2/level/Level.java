@@ -15,18 +15,19 @@ public class Level extends Observable
 	{
 		if (!finished) 
 		{
+			r.x = x;
+			r.y = y;
+			
 			// loop through all rooms (so far) and see
 			// if they collide
 			for (Room room : rooms) 
-			{
+			{		
 				if (rectInBoundry(r, room)) { 
 					return false; 
 				}
 			}
 			
 			// passed; set position and add room to list
-			r.x = x;
-			r.y = y;
 			rooms.add(r);
 			return true;
 		}
@@ -40,7 +41,7 @@ public class Level extends Observable
 	}
 	
 	// move the player to a given room moveTo
-	public void move(Room moveTo) 
+	void move(Room moveTo) 
 	{
 		if (moveTo != null) 
 		{
@@ -51,10 +52,13 @@ public class Level extends Observable
 	};
 	
 	// basic overlapping test between to rectangles
+	// from http://www.jeffreythompson.org/collision-detection/rect-rect.php
 	private boolean rectInBoundry(Room r1, Room r2) 
 	{
-		return (r1.x < r2.x + r2.dx &&  r1.x + r1.dx < r2.x &&
-				   r1.y < r2.y + r2.dy && r1.y + r1.dy < r1.y);
+		return (r1.x + r1.dx > r2.x &&  
+				r1.x < r2.x + r2.dx &&
+				r1.y + r1.dy > r2.y && 
+				r1.y < r2.y + r2.dy);
 	}
 	
 	

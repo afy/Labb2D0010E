@@ -92,9 +92,10 @@ public class LevelGUI implements Observer {
 			// for corridors north of block
 			// the position logic is too hard to explain here
 			// but is in theory pretty simple
-			if (rTo.y > rFrom.y) { 
-				g.drawLine(rFrom.x+m, rFrom.y+rFrom.dy+n, 
-						rFrom.x+rFrom.dx-m, rFrom.y+rFrom.dy+n);
+			if (rTo.y < rFrom.y) { 
+				g.drawLine(rFrom.x+m, rFrom.y-n, 
+						rFrom.x+rFrom.dx-m, rFrom.y-n);
+				
 			}
 			
 			// for corridors east of block
@@ -104,9 +105,9 @@ public class LevelGUI implements Observer {
 			}
 			
 			// for corridors south of block
-			else if (rTo.y < rFrom.y) { // south
-				g.drawLine(rFrom.x+m, rFrom.y-n, 
-						rFrom.x+rFrom.dx-m, rFrom.y-n);
+			else if (rTo.y > rFrom.y) { // south
+				g.drawLine(rFrom.x+m, rFrom.y+rFrom.dy+n, 
+						rFrom.x+rFrom.dx-m, rFrom.y+rFrom.dy+n);
 			}
 				
 			// for corridors west of block
